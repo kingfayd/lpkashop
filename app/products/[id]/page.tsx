@@ -1,0 +1,116 @@
+import { prisma } from "@/lib/prisma";
+import Link from "next/link";
+import { ChevronLeft, MessageCircle, Package, ShieldCheck } from "lucide-react";
+import { notFound } from "next/navigation";
+
+export default async function ProductDetailPage({
+    params,
+}: {
+    params: Promise<{ id: string }>;
+}) {
+    const { id } = await params;
+    const product = await prisma.product.findUnique({
+        where: { id },
+        include: { category: true },
+    });
+
+    if (!product) {
+        notFound();
+    }
+
+    const whatsappNumber = "6281234567890"; // Placeholder
+    const message = `Halo, saya ingin membeli ${product.name} seharga Rp ${product.price.toLocaleString("id-ID")}. Apakah stok masih ada?`;
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+        message
+    )}`;
+
+    return (
+        <div className="bg-white min-h-screen font-sans text-black">
+            {/* Navbar Minimalist */}
+            <nav className="border-b border-gray-100 bg-white sticky top-0 z-10">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
+                    <Link
+                        href="/"
+                        className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors font-medium"
+                    >
+                        <ChevronLeft size={20} />
+                        Kembali ke Katalog
+                    </Link>
+                </div>
+            </nav>
+
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div className="flex flex-col lg:flex-row gap-12">
+                    {/* Image Gallery */}
+                    <div className="flex-1">
+                        <div className="aspect-square bg-gray-50 rounded-3xl overflow-hidden border border-gray-100 shadow-sm">
+                            {product.imageUrl ? (
+                                <img
+                                    src={product.imageUrl}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex flex-col items-center justify-center text-gray-300 gap-2">
+                                    <Package size={64} />
+                                    <span>No Image Available</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Product Info */}
+                    <div className="flex-1 space-y-8">
+                        <div>
+                            <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                                {product.category.name}
+                            </span>
+                            <h1 className="mt-4 text-4xl font-extrabold text-gray-900 leading-tight">
+                                {product.name}
+                            </h1>
+                            <p className="mt-4 text-3xl font-black text-gray-900">
+                                Rp {product.price.toLocaleString("id-ID")}
+                            </p>
+                        </div>
+
+                        <div className="text-gray-600 max-w-none">
+                            <h3 className="text-lg font-bold text-gray-900 border-b pb-2 mb-4">
+                                Deskripsi Produk
+                            </h3>
+                            <p className="whitespace-pre-wrap leading-relaxed">
+                                {product.description || "Tidak ada deskripsi untuk produk ini."}
+                            </p>
+                        </div>
+
+                        <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 space-y-4">
+                            <div className="flex items-center gap-3 text-sm text-gray-600">
+                                <Package size={18} className="text-blue-600" />
+                                <span>
+                                    Stok Tersedia: <strong>{product.stock} pcs</strong>
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-3 text-sm text-gray-600">
+                                <ShieldCheck size={18} className="text-green-600" />
+                                <span>Kualitas Terjamin & Transaksi Aman</span>
+                            </div>
+                        </div>
+
+                        <a
+                            href={whatsappUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full bg-[#25D366] text-white py-4 rounded-2xl text-lg font-bold flex items-center justify-center gap-3 hover:bg-[#20ba5a] transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-green-200"
+                        >
+                            <MessageCircle size={24} />
+                            Beli Sekarang via WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </main>
+
+            <footer className="mt-20 py-12 border-t border-gray-100 text-center text-gray-400 text-xs">
+                <p>© 2026 LPKA Shop. All rights reserved.</p>
+            </footer>
+        </div>
+    );
+}
