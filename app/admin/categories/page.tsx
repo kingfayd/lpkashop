@@ -17,7 +17,7 @@ export default async function CategoriesPage() {
 
             {/* Add Category Form */}
             <section className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm mb-8">
-                <form action={createCategory as any} className="flex gap-4">
+                <form action={createCategory as unknown as (payload: FormData) => void} className="flex gap-4">
                     <input
                         type="text"
                         name="name"
@@ -68,7 +68,7 @@ export default async function CategoriesPage() {
                                         {category.name}
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <form action={deleteCategory as any}>
+                                        <form action={deleteCategory as unknown as (payload: FormData) => void}>
                                             <input type="hidden" name="id" value={category.id} />
                                             <button
                                                 type="submit"

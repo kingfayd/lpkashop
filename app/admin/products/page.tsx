@@ -91,7 +91,7 @@ export default async function ProductsPage() {
                                     </td>
                                     <td className="px-6 py-4 text-gray-800">{product.stock}</td>
                                     <td className="px-6 py-4 text-right">
-                                        <form action={deleteProduct as any}>
+                                        <form action={deleteProduct as unknown as (payload: FormData) => void}>
                                             <input type="hidden" name="id" value={product.id} />
                                             <button
                                                 type="submit"

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Package, ListTree, UserCheck } from "lucide-react";
+import { Package, ListTree } from "lucide-react";
 
 export default async function AdminDashboard() {
     const [productCount, categoryCount] = await Promise.all([

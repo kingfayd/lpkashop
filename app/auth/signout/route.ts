@@ -2,7 +2,7 @@ import { createClient } from '@/app/lib/supabase-server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
-export async function POST(request: Request) {
+export async function POST() {
     const supabase = await createClient()
 
     // Check if a user's session is active
