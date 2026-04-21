@@ -3,6 +3,7 @@ import { getCategories } from "@/lib/actions/category";
 import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
 import { ShoppingCart } from "lucide-react";
+import Image from "next/image";
 
 export default async function Home({
   searchParams,
@@ -93,10 +94,11 @@ export default async function Home({
                   >
                     <div className="aspect-square bg-gray-50 relative overflow-hidden">
                       {product.imageUrl ? (
-                        <img
+                        <Image
                           src={product.imageUrl}
                           alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-300">

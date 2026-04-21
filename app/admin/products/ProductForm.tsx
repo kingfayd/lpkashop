@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { createProduct } from "@/lib/actions/product";
 import { Upload, X, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function ProductForm({
     categories,
@@ -137,10 +138,11 @@ export default function ProductForm({
                         >
                             {preview ? (
                                 <>
-                                    <img
+                                    <Image
                                         src={preview}
                                         alt="Preview"
-                                        className="w-full h-full object-cover"
+                                        fill
+                                        className="object-cover"
                                     />
                                     <button
                                         type="button"

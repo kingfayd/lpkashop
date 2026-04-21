@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import Image from "next/image";
 import { ChevronLeft, MessageCircle, Package, ShieldCheck } from "lucide-react";
 import { notFound } from "next/navigation";
 
@@ -43,12 +44,13 @@ export default async function ProductDetailPage({
                 <div className="flex flex-col lg:flex-row gap-12">
                     {/* Image Gallery */}
                     <div className="flex-1">
-                        <div className="aspect-square bg-gray-50 rounded-3xl overflow-hidden border border-gray-100 shadow-sm">
+                        <div className="aspect-square bg-gray-50 rounded-3xl overflow-hidden border border-gray-100 shadow-sm relative">
                             {product.imageUrl ? (
-                                <img
+                                <Image
                                     src={product.imageUrl}
                                     alt={product.name}
-                                    className="w-full h-full object-cover"
+                                    fill
+                                    className="object-cover"
                                 />
                             ) : (
                                 <div className="w-full h-full flex flex-col items-center justify-center text-gray-300 gap-2">

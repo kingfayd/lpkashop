@@ -2,6 +2,7 @@ import { getProducts, deleteProduct } from "@/lib/actions/product";
 import { getCategories } from "@/lib/actions/category";
 import ProductForm from "./ProductForm";
 import { Trash2, Package } from "lucide-react";
+import Image from "next/image";
 
 export default async function ProductsPage() {
     const [products, categories] = await Promise.all([
@@ -62,10 +63,12 @@ export default async function ProductsPage() {
                                 >
                                     <td className="px-6 py-4">
                                         {product.imageUrl ? (
-                                            <img
+                                            <Image
                                                 src={product.imageUrl}
                                                 alt={product.name}
-                                                className="w-12 h-12 rounded-lg object-cover bg-gray-100"
+                                                width={48}
+                                                height={48}
+                                                className="rounded-lg object-cover bg-gray-100"
                                             />
                                         ) : (
                                             <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
