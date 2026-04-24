@@ -86,7 +86,7 @@ export default async function Home({
                   Belum ada produk yang tersedia.
                 </div>
               ) : (
-                products.map((product) => (
+                products.map((product, index) => (
                   <Link
                     href={`/products/${product.id}`}
                     key={product.id}
@@ -98,6 +98,8 @@ export default async function Home({
                           src={product.imageUrl}
                           alt={product.name}
                           fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          priority={index === 0}
                           className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       ) : (

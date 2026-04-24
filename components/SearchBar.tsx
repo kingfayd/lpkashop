@@ -12,13 +12,20 @@ export default function SearchBar() {
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
     useEffect(() => {
-        const params = new URLSearchParams(searchParams.toString());
+        const currentParamsStr = searchParams.toString();
+        const params = new URLSearchParams(currentParamsStr);
+        
         if (debouncedSearchTerm) {
             params.set("q", debouncedSearchTerm);
         } else {
             params.delete("q");
         }
-        router.push(`/?${params.toString()}`, { scroll: false });
+        
+        const newParamsStr = params.toString();
+        if (currentParamsStr !== newParamsStr) {
+            const query = newParamsStr ? `?${newParamsStr}` : '';
+            router.push(`/${query}`, { scroll: false });
+        }
     }, [debouncedSearchTerm, router, searchParams]);
 
     return (
