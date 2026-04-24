@@ -3,13 +3,14 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function getProducts(query?: string) {
+export async function getProducts(query?: string, categoryId?: string) {
     return await prisma.product.findMany({
         where: {
             name: {
                 contains: query,
                 mode: "insensitive",
             },
+            ...(categoryId ? { categoryId } : {}),
         },
         include: { category: true },
         orderBy: { createdAt: "desc" },

@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronLeft, MessageCircle, Package, ShieldCheck } from "lucide-react";
+import { ChevronLeft, MessageCircle, Package, ShieldCheck, ShoppingBag } from "lucide-react";
 import { notFound } from "next/navigation";
 
 export default async function ProductDetailPage({
@@ -105,6 +105,16 @@ export default async function ProductDetailPage({
                         >
                             <MessageCircle size={24} />
                             Beli Sekarang via WhatsApp
+                        </a>
+
+                        <a
+                            href="#"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full bg-[#EE4D2D] text-white py-4 rounded-2xl text-lg font-bold flex items-center justify-center gap-3 hover:bg-[#d74223] transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-orange-200"
+                        >
+                            <ShoppingBag size={24} />
+                            Beli via Shopee
                         </a>
                     </div>
                 </div>

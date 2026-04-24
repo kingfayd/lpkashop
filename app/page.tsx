@@ -8,11 +8,11 @@ import Image from "next/image";
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; category?: string }>;
 }) {
-  const { q } = await searchParams;
+  const { q, category } = await searchParams;
   const [products, categories] = await Promise.all([
-    getProducts(q),
+    getProducts(q, category),
     getCategories(),
   ]);
 
@@ -64,16 +64,20 @@ export default async function Home({
               Kategori
             </h3>
             <div className="flex md:flex-col flex-wrap gap-2">
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium text-left">
+              <Link 
+                href={q ? `/?q=${q}` : "/"} 
+                className={`px-4 py-2 rounded-lg text-sm font-medium text-left transition-colors ${!category ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+              >
                 Semua Produk
-              </button>
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium text-left transition-colors"
+              </Link>
+              {categories.map((cat) => (
+                <Link
+                  key={cat.id}
+                  href={`/?category=${cat.id}${q ? `&q=${q}` : ''}`}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium text-left transition-colors ${category === cat.id ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
-                  {category.name}
-                </button>
+                  {cat.name}
+                </Link>
               ))}
             </div>
           </aside>
