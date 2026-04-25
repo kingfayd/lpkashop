@@ -37,6 +37,8 @@ export default function ResetPasswordPage() {
             setError(error.message)
             setLoading(false)
         } else {
+            // Logout setelah sukses ganti password agar sesi bersih
+            await supabase.auth.signOut()
             setSuccess(true)
             setLoading(false)
             setTimeout(() => {
