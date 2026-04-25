@@ -7,6 +7,12 @@ import { Trash2, Package, Pencil } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+type ProductMedia = {
+    id: string;
+    url: string;
+    type: "IMAGE" | "VIDEO";
+};
+
 type Product = {
     id: string;
     name: string;
@@ -17,6 +23,7 @@ type Product = {
     shopeeUrl: string | null;
     categoryId: string;
     category: { id: string; name: string };
+    media: ProductMedia[];
 };
 
 export default function ProductsClient({
@@ -48,15 +55,13 @@ export default function ProductsClient({
                 <p className="text-gray-500">Tambah, edit, atau hapus produk dari katalog.</p>
             </header>
 
-            {editingProduct ? (
-                <ProductForm
-                    categories={categories}
-                    editProduct={editingProduct}
-                    onCancel={() => setEditingProduct(null)}
-                />
-            ) : (
-                <ProductForm categories={categories} />
-            )}
+            <ProductForm
+                key={editingProduct?.id || 'new'}
+                categories={categories}
+                editProduct={editingProduct || undefined}
+                onCancel={() => setEditingProduct(null)}
+            />
+
 
             <section className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mt-8 text-black">
                 <div className="overflow-x-auto">
