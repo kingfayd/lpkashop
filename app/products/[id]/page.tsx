@@ -107,15 +107,17 @@ export default async function ProductDetailPage({
                             Beli Sekarang via WhatsApp
                         </a>
 
-                        <a
-                            href="#"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full bg-[#EE4D2D] text-white py-4 rounded-2xl text-lg font-bold flex items-center justify-center gap-3 hover:bg-[#d74223] transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-orange-200"
-                        >
-                            <ShoppingBag size={24} />
-                            Beli via Shopee
-                        </a>
+                        {product.shopeeUrl && (
+                            <a
+                                href={product.shopeeUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full bg-[#EE4D2D] text-white py-4 rounded-2xl text-lg font-bold flex items-center justify-center gap-3 hover:bg-[#d74223] transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-orange-200"
+                            >
+                                <ShoppingBag size={24} />
+                                Beli via Shopee
+                            </a>
+                        )}
                     </div>
                 </div>
             </main>
