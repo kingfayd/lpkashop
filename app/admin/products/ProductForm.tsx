@@ -7,6 +7,12 @@ import { Upload, X, Loader2, ShoppingBag } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+type ProductMedia = {
+    id?: string;
+    url: string;
+    type: "IMAGE" | "VIDEO";
+};
+
 type Product = {
     id: string;
     name: string;
@@ -16,6 +22,7 @@ type Product = {
     imageUrl: string | null;
     shopeeUrl: string | null;
     categoryId: string;
+    media?: ProductMedia[];
 };
 
 export default function ProductForm({
@@ -31,6 +38,8 @@ export default function ProductForm({
     const [loading, setLoading] = useState(false);
     const [image, setImage] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(editProduct?.imageUrl || null);
+    const [media, setMedia] = useState<ProductMedia[]>(editProduct?.media || []);
+    const [uploadingMedia, setUploadingMedia] = useState(false);
     const router = useRouter();
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,6 +48,44 @@ export default function ProductForm({
             setImage(file);
             setPreview(URL.createObjectURL(file));
         }
+    };
+
+    const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+
+        setUploadingMedia(true);
+        const newMedia: ProductMedia[] = [...media];
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const isVideo = file.type.startsWith("video/");
+            const fileExt = file.name.split(".").pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const filePath = `products/${fileName}`;
+
+            const { error } = await supabase.storage
+                .from("products")
+                .upload(filePath, file);
+
+            if (error) {
+                alert(`Gagal upload media: ${error.message}`);
+            } else {
+                const { data: { publicUrl } } = supabase.storage.from("products").getPublicUrl(filePath);
+                newMedia.push({
+                    url: publicUrl,
+                    type: isVideo ? "VIDEO" : "IMAGE"
+                });
+            }
+        }
+
+        setMedia(newMedia);
+        setUploadingMedia(false);
+        e.target.value = ""; // Reset input
+    };
+
+    const removeMedia = (index: number) => {
+        setMedia(media.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -58,7 +105,7 @@ export default function ProductForm({
                 .upload(filePath, image);
 
             if (error) {
-                alert(`Gagal upload gambar: ${error.message}`);
+                alert(`Gagal upload gambar utama: ${error.message}`);
                 setLoading(false);
                 return;
             } else {
@@ -68,6 +115,7 @@ export default function ProductForm({
         }
 
         formData.set("imageUrl", imageUrl);
+        formData.set("media", JSON.stringify(media));
 
         let result;
         if (isEditing) {
@@ -82,6 +130,7 @@ export default function ProductForm({
             if (!isEditing) {
                 setImage(null);
                 setPreview(null);
+                setMedia([]);
                 (e.target as HTMLFormElement).reset();
             } else {
                 onCancel?.();
@@ -108,7 +157,7 @@ export default function ProductForm({
                     </button>
                 )}
             </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700">Nama Produk</label>
@@ -182,9 +231,10 @@ export default function ProductForm({
                     />
                 </div>
 
-                <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
-                        Gambar Produk {isEditing && "(biarkan kosong jika tidak ingin mengganti)"}
+                {/* Gambar Utama (Thumbnail) */}
+                <div className="space-y-2 border-t pt-4">
+                    <label className="text-sm font-bold text-gray-900">
+                        Gambar Utama (Thumbnail Katalog)
                     </label>
                     <div className="flex items-center gap-4">
                         <div
@@ -226,17 +276,83 @@ export default function ProductForm({
                             onChange={handleImageChange}
                         />
                         <div className="text-xs text-gray-500">
-                            <p>Ukuran ideal: 800x800px</p>
-                            <p>Maks. ukuran file: 2MB</p>
+                            <p>Gambar yang muncul di halaman depan.</p>
+                            <p>Maks. 2MB</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex gap-3">
+                {/* Media Slider (Multi Photos & Videos) */}
+                <div className="space-y-3 border-t pt-4">
+                    <div className="flex items-center justify-between">
+                        <label className="text-sm font-bold text-gray-900">
+                            Galeri Detail (Foto & Video)
+                        </label>
+                        <button
+                            type="button"
+                            onClick={() => document.getElementById("media-upload")?.click()}
+                            disabled={uploadingMedia}
+                            className="text-xs bg-gray-900 text-white px-3 py-1.5 rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                        >
+                            {uploadingMedia ? <Loader2 className="animate-spin" size={14} /> : <Upload size={14} />}
+                            Tambah Media
+                        </button>
+                        <input
+                            id="media-upload"
+                            type="file"
+                            multiple
+                            className="hidden"
+                            accept="image/*,video/*"
+                            onChange={handleMediaUpload}
+                        />
+                    </div>
+                    
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                        {media.map((m, index) => (
+                            <div key={index} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 bg-gray-50 group">
+                                {m.type === "IMAGE" ? (
+                                    <Image src={m.url} alt="Media" fill className="object-cover" />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-black">
+                                        <video src={m.url} className="w-full h-full object-cover opacity-60" />
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <div className="w-8 h-8 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center">
+                                                <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white border-b-[6px] border-b-transparent ml-1" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => removeMedia(index)}
+                                    className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <X size={12} />
+                                </button>
+                                <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-[10px] text-white text-center py-0.5">
+                                    {m.type}
+                                </div>
+                            </div>
+                        ))}
+                        {media.length === 0 && !uploadingMedia && (
+                            <div className="col-span-full py-8 border-2 border-dashed border-gray-200 rounded-lg text-center text-gray-400 text-xs">
+                                Belum ada foto/video tambahan.
+                            </div>
+                        )}
+                        {uploadingMedia && (
+                            <div className="aspect-square border-2 border-dashed border-blue-200 rounded-lg flex flex-col items-center justify-center text-blue-500 animate-pulse">
+                                <Loader2 className="animate-spin mb-1" size={20} />
+                                <span className="text-[10px]">Uploading...</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="flex gap-3 pt-4">
                     <button
                         type="submit"
-                        disabled={loading}
-                        className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 font-bold disabled:bg-gray-400"
+                        disabled={loading || uploadingMedia}
+                        className="flex-1 bg-blue-600 text-white px-6 py-4 rounded-xl hover:bg-blue-700 transition-all flex items-center justify-center gap-2 font-bold disabled:bg-gray-400 shadow-lg shadow-blue-100"
                     >
                         {loading ? (
                             <>
@@ -251,7 +367,7 @@ export default function ProductForm({
                         <button
                             type="button"
                             onClick={onCancel}
-                            className="px-6 py-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                            className="px-6 py-4 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-medium"
                         >
                             Batal
                         </button>

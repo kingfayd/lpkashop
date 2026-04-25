@@ -25,12 +25,15 @@ export async function createProduct(formData: FormData) {
     const categoryId = formData.get("categoryId") as string;
     const imageUrl = formData.get("imageUrl") as string;
     const shopeeUrl = formData.get("shopeeUrl") as string;
+    const mediaData = formData.get("media") as string; // JSON string of [{url, type}]
 
     if (!name || isNaN(price) || !categoryId) {
         return { error: "Missing required fields" };
     }
 
     try {
+        const media = mediaData ? JSON.parse(mediaData) : [];
+        
         await prisma.product.create({
             data: {
                 name,
@@ -40,6 +43,13 @@ export async function createProduct(formData: FormData) {
                 categoryId,
                 imageUrl,
                 shopeeUrl: shopeeUrl || null,
+                media: {
+                    create: media.map((m: any, index: number) => ({
+                        url: m.url,
+                        type: m.type,
+                        order: index
+                    }))
+                }
             },
         });
         revalidatePath("/admin/products");
@@ -60,24 +70,40 @@ export async function updateProduct(formData: FormData) {
     const categoryId = formData.get("categoryId") as string;
     const imageUrl = formData.get("imageUrl") as string;
     const shopeeUrl = formData.get("shopeeUrl") as string;
+    const mediaData = formData.get("media") as string;
 
     if (!id || !name || isNaN(price) || !categoryId) {
         return { error: "Missing required fields" };
     }
 
     try {
-        await prisma.product.update({
-            where: { id },
-            data: {
-                name,
-                description,
-                price,
-                stock,
-                categoryId,
-                ...(imageUrl ? { imageUrl } : {}),
-                shopeeUrl: shopeeUrl || null,
-            },
-        });
+        const media = mediaData ? JSON.parse(mediaData) : [];
+
+        await prisma.$transaction([
+            // Delete old media first
+            prisma.productMedia.deleteMany({ where: { productId: id } }),
+            // Update product and create new media
+            prisma.product.update({
+                where: { id },
+                data: {
+                    name,
+                    description,
+                    price,
+                    stock,
+                    categoryId,
+                    ...(imageUrl ? { imageUrl } : {}),
+                    shopeeUrl: shopeeUrl || null,
+                    media: {
+                        create: media.map((m: any, index: number) => ({
+                            url: m.url,
+                            type: m.type,
+                            order: index
+                        }))
+                    }
+                },
+            })
+        ]);
+
         revalidatePath("/admin/products");
         revalidatePath("/");
         revalidatePath(`/products/${id}`);

@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import Image from "next/image";
 import { ChevronLeft, MessageCircle, Package, ShieldCheck, ShoppingBag } from "lucide-react";
 import { notFound } from "next/navigation";
+import MediaSlider from "./MediaSlider";
 
 export default async function ProductDetailPage({
     params,
@@ -12,7 +12,12 @@ export default async function ProductDetailPage({
     const { id } = await params;
     const product = await prisma.product.findUnique({
         where: { id },
-        include: { category: true },
+        include: { 
+            category: true,
+            media: {
+                orderBy: { order: 'asc' }
+            }
+        },
     });
 
     if (!product) {
@@ -42,23 +47,9 @@ export default async function ProductDetailPage({
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="flex flex-col lg:flex-row gap-12">
-                    {/* Image Gallery */}
+                    {/* Image Gallery Slider */}
                     <div className="flex-1">
-                        <div className="aspect-square bg-gray-50 rounded-3xl overflow-hidden border border-gray-100 shadow-sm relative">
-                            {product.imageUrl ? (
-                                <Image
-                                    src={product.imageUrl}
-                                    alt={product.name}
-                                    fill
-                                    className="object-cover"
-                                />
-                            ) : (
-                                <div className="w-full h-full flex flex-col items-center justify-center text-gray-300 gap-2">
-                                    <Package size={64} />
-                                    <span>No Image Available</span>
-                                </div>
-                            )}
-                        </div>
+                        <MediaSlider media={product.media} thumbnail={product.imageUrl} />
                     </div>
 
                     {/* Product Info */}
