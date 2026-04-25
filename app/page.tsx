@@ -42,11 +42,11 @@ export default async function Home({
       {/* Hero */}
       <header className="bg-blue-600 py-16 px-4 text-center">
         <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-4">
-          Premium Products, Simple Shopping
+          Karya Kreatif Anak Binaan LPKA
         </h1>
         <p className="text-blue-100 text-lg max-w-2xl mx-auto">
-          Temukan produk impianmu dengan kualitas terbaik dan harga terjangkau.
-          Belanja mudah, tinggal sekali klik!
+          Setiap produk adalah bukti semangat dan transformasi anak-anak binaan LPKA. 
+          Dukung kemandirian mereka dengan mengapresiasi karya tangan berkualitas tinggi.
         </p>
       </header>
 
