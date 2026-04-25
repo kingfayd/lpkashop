@@ -30,12 +30,7 @@ export default async function Home({
           </div>
 
           <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors">
-              Masuk
-            </Link>
-            <Link href="/register" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors">
-              Daftar
-            </Link>
+            {/* Login/Register removed for public */}
           </div>
         </div>
         {/* Mobile Search Bar - Only visible on small screens */}

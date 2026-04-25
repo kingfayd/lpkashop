@@ -41,8 +41,8 @@ export default function LoginPage() {
                     <Link href="/" className="inline-flex items-center gap-2 mb-6">
                         <span className="text-2xl font-bold text-blue-600">LPKA Shop</span>
                     </Link>
-                    <h2 className="text-2xl font-bold">Selamat Datang Kembali</h2>
-                    <p className="text-sm text-gray-500 mt-2">Masuk ke akun LPKA Shop kamu</p>
+                    <h2 className="text-2xl font-bold">Admin Login</h2>
+                    <p className="text-sm text-gray-500 mt-2">Masuk ke Panel Admin LPKA Shop</p>
                 </div>
 
                 <form className="mt-8 space-y-6" onSubmit={handleLogin}>
@@ -85,12 +85,7 @@ export default function LoginPage() {
                     </button>
                 </form>
 
-                <p className="text-center text-sm text-gray-500 mt-6">
-                    Belum punya akun?{' '}
-                    <Link href="/register" className="text-blue-600 font-semibold hover:underline">
-                        Daftar Sekarang
-                    </Link>
-                </p>
+
             </div>
         </div>
     )
